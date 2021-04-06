@@ -3,8 +3,11 @@
 ## Setup
 
 ### Create weavescope
+
+```bash
 kubectl create clusterrolebinding "cluster-admin-$(whoami)" --clusterrole=cluster-admin --user="$(gcloud config get-value core/account)"
 kubectl apply -f "https://cloud.weave.works/k8s/scope.yaml?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+```
 
 ```bash
 WEAVE_POD=$(kubectl get pod -n weave | grep app | awk '{printf("%s", $1)}')
@@ -12,11 +15,16 @@ kubectl port-forward -n weave $WEAVE_POD 4040
 ```
 
 ### Create zookeeper, kafka y kafka-rest
+
+```bash
 kubectl apply -f zookeeper.yml
 kubectl apply -f kafka.yml
 kubectl apply -f kafka-http.yml
+```
 
 ### Configure data topics
+
+```bash
 kubectl exec -it kafka-0 bash
 /opt/kafka/bin/kafka-topics.sh --create --partitions 60 --zookeeper zk-cs:2181 --replication-factor 3 --topic agg-metrics
 /opt/kafka/bin/kafka-topics.sh --create --partitions 60 --zookeeper zk-cs:2181 --replication-factor 3 --topic data
@@ -24,17 +32,27 @@ kubectl exec -it kafka-0 bash
 /opt/kafka/bin/kafka-topics.sh --create --partitions 60 --zookeeper zk-cs:2181 --replication-factor 3 --topic alerts
 /opt/kafka/bin/kafka-topics.sh --create --partitions 60 --zookeeper zk-cs:2181 --replication-factor 3 --topic control
 /opt/kafka/bin/kafka-topics.sh --create --partitions 60 --zookeeper zk-cs:2181 --replication-factor 3 --topic sensor-metadata
+```
 
 ### Create Kafka Streams engine
-kubectl apply -f iot-engine.yml
 
+```bash
+kubectl apply -f iot-engine.yml
+```
 
 ## Working
 
+## Configure IP
+
+
+```bash
+export HTTP_KAFKA_REST_IP=<IP>
+export HTTP_IOT_ENGINE=<IP>
+```
+
 ### Sending data
 
-``bash
-HTTP_KAFKA_REST_IP=34.67.217.212
+```bash
 docker run -it -e HTTP_SERVER=$HTTP_KAFKA_REST_IP:8082 -e HTTP_TOPIC=data -e HTTP_INTERVAL_MS=10 andresgomezfrr/data-simulator:3.0
 ```
 
@@ -53,14 +71,13 @@ curl http://$HTTP_IOT_ENGINE:5574/iot-engine/query/metrics/$ID/$START/$END
 * temperature > 22
 
 ```bash
-HTTP_IOT_ENGINE=35.225.97.107
 curl http://$HTTP_IOT_ENGINE:5574/iot-engine/query/rules -d '{"id":"1111","rules":[{"ruleName":"max_temperature","metricName":"temperature","metricValue":22,"condition":">"},{"ruleName":"min_humidity","metricName":"humidity","metricValue":50,"condition":"<"}]}' -H "Content-type: application/json"
 ```
 
 ### Create alert streams
 
 ```bash
- curl -X POST -H "Content-Type: application/vnd.kafka.v2+json" -H "Accept: application/vnd.kafka.v2+json" \
+curl -X POST -H "Content-Type: application/vnd.kafka.v2+json" -H "Accept: application/vnd.kafka.v2+json" \
     --data '{"name": "alert_consumer_instance", "format": "json", "auto.offset.reset": "latest"}' \
     http://$HTTP_KAFKA_REST_IP:8082/consumers/alert_stream
 
