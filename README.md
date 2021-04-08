@@ -26,12 +26,12 @@ kubectl apply -f kafka-http.yml
 
 ```bash
 kubectl exec -it kafka-0 bash
-/opt/kafka/bin/kafka-topics.sh --create --partitions 60 --zookeeper zk-cs:2181 --replication-factor 3 --topic agg-metrics
-/opt/kafka/bin/kafka-topics.sh --create --partitions 60 --zookeeper zk-cs:2181 --replication-factor 3 --topic data
-/opt/kafka/bin/kafka-topics.sh --create --partitions 60 --zookeeper zk-cs:2181 --replication-factor 3 --topic rules
-/opt/kafka/bin/kafka-topics.sh --create --partitions 60 --zookeeper zk-cs:2181 --replication-factor 3 --topic alerts
-/opt/kafka/bin/kafka-topics.sh --create --partitions 60 --zookeeper zk-cs:2181 --replication-factor 3 --topic control
-/opt/kafka/bin/kafka-topics.sh --create --partitions 60 --zookeeper zk-cs:2181 --replication-factor 3 --topic sensor-metadata
+/opt/kafka/bin/kafka-topics.sh --create --partitions 10 --zookeeper zk-cs:2181 --replication-factor 3 --topic agg-metrics
+/opt/kafka/bin/kafka-topics.sh --create --partitions 10 --zookeeper zk-cs:2181 --replication-factor 3 --topic data
+/opt/kafka/bin/kafka-topics.sh --create --partitions 10 --zookeeper zk-cs:2181 --replication-factor 3 --topic rules
+/opt/kafka/bin/kafka-topics.sh --create --partitions 10 --zookeeper zk-cs:2181 --replication-factor 3 --topic alerts
+/opt/kafka/bin/kafka-topics.sh --create --partitions 10 --zookeeper zk-cs:2181 --replication-factor 3 --topic control
+/opt/kafka/bin/kafka-topics.sh --create --partitions 10 --zookeeper zk-cs:2181 --replication-factor 3 --topic sensor-metadata
 ```
 
 ### Create Kafka Streams engine
